@@ -1,0 +1,103 @@
+import React, { useState, useRef, useEffect } from "react";
+import type { Task } from "../@types/task";
+
+type TaskCardProps = {
+    task: Task;
+    editingId: number | null;
+    editText: string;
+    setEditingId: (id: number | null) => void;
+    setEditText: (text: string) => void;
+    handleEdit: (id: number, text: string) => void;
+    handleDelete: (id: number) => void;
+    handleComplete?: (id: number, completed: boolean) => void; // Add this prop if needed
+};
+
+const TaskCard: React.FC<TaskCardProps> = ({
+    task,
+    editingId,
+    editText,
+    setEditingId,
+    setEditText,
+    handleEdit,
+    handleDelete,
+    handleComplete,
+}) => {
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (editingId === task.id && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [editingId, task.id]);
+
+    return (
+        <div
+            key={task.id}
+            className="bg-gray-800 rounded-lg shadow-md p-4 mb-4 flex items-center justify-between"
+        >
+            <input
+                type="checkbox"
+                checked={!!task.completed}
+                onChange={() => handleComplete && handleComplete(task.id, !task.completed)}
+                className="mr-4 accent-green-600"
+                title="Mark as completed"
+                style={{ width: "1rem", height: "1rem" }}
+            />
+            <div className="flex-1 flex items-center">
+                {editingId === task.id ? (
+                    <form
+                        onSubmit={e => {
+                            e.preventDefault();
+                            handleEdit(task.id, editText);
+                            setEditingId(null);
+                        }}
+                        action=""
+                        className="flex-1"
+                    >
+                        <input
+                            ref={inputRef}
+                            value={editText}
+                            onChange={e => setEditText(e.target.value)}
+                            className="flex-1 mr-2 border border-gray-700 bg-gray-900 text-white rounded px-2 py-1"
+                        />
+                    </form>
+                ) : (
+                    <span className={`text-white ${task.completed ? "line-through opacity-60" : ""}`}>
+                        {task.text}
+                    </span>
+                )}
+            </div>
+            <div>
+                {editingId === task.id ? (
+                    <button
+                        onClick={() => {
+                            handleEdit(task.id, editText);
+                            setEditingId(null);
+                        }}
+                        className="mr-2 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                    >
+                        Save
+                    </button>
+                ) : (
+                    <button
+                        onClick={() => {
+                            setEditingId(task.id);
+                            setEditText(task.text);
+                        }}
+                        className="mr-2 px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600 transition"
+                    >
+                        Edit
+                    </button>
+                )}
+                <button
+                    onClick={() => handleDelete(task.id)}
+                    className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                >
+                    Delete
+                </button>
+            </div>
+        </div>
+    );
+};
+
+export default TaskCard;
