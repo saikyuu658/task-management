@@ -1,85 +1,53 @@
-import { useEffect, useState } from 'react';
-import type { Task } from './@types/task';
-import TaskCard from './components/taskCard';
 import Sidebar from './components/sidebar';
-
+import Lists from './components/listsTask';
+import Title from './components/titleTask';
+import { useEffect, useState } from 'react';
+import ModalLogin from './components/Login';
 
 
 function App() {
 
-   const [tasks, setTasks] = useState<Task[]>([
-    { id: 1, text: 'Buy groceries' },
-  ]);
-
+  const [sideControll, setSideControll] = useState(false);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Handle Shift + N (either shift key)
-      if ((e.key === 'n' || e.key === 'N') && e.shiftKey) {
-      e.preventDefault();
-      handleAdd();
+      function handleResize() {
+          if (window.innerWidth <= 740) {
+              setSideControll(true);
+          } else {
+              setSideControll(false);
+          }
       }
-    };
+      window.addEventListener("resize", handleResize);
+      handleResize();
+      return () => window.removeEventListener("resize", handleResize);
+  }, [setSideControll]);
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [tasks]);
 
- 
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editText, setEditText] = useState('');
-
-  const handleAdd = () => {
-    const newTask: Task = {
-      id: Date.now(),
-      text: 'New Task',
-      completed: false,
-    };
-    setTasks([...tasks, newTask]);
-    setEditingId(newTask.id);
-    setEditText(newTask.text);
-  };
-
-  const handleEdit = (id: number, newText: string) => {
-    setTasks(tasks.map(task => (task.id === id ? { ...task, text: newText } : task)));
-  };
-
-  const handleDelete = (id: number) => {
-    setTasks(tasks.filter(task => task.id !== id));
-  };
 
   return (
     <>
-      <Sidebar></Sidebar>
-      <div className="p-8 max-w-lg mx-auto">
-        <h2 className="text-center text-2xl font-bold mb-6">Task Management</h2>
-        {tasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            editingId={editingId}
-            editText={editText}
-            setEditingId={setEditingId}
-            setEditText={setEditText}
-            handleEdit={handleEdit}
-            handleDelete={handleDelete}
-            handleComplete={(id, completed) => {
-              setTasks(tasks.map(t => t.id === id ? { ...t, completed } : t));
-            }}
-          />
-        ))}
+      <div className="flex min-h-screen">
+        <div className={sideControll? "fixed z-50": ""}>
+          <Sidebar />
+        </div>
+        <main className="flex-1 bg-gray-900 text-white p-4">
+          <Title />
+          <Lists />
+          <div className="relative bottom-[-50px] w-full flex justify-center z-10">
+              <button
+                  onClick={() => {  }}
+                  className="bg-blue-600 text-white border-none rounded-full px-12 py-1 text-xl shadow-lg cursor-pointer flex items-center justify-center"
+                  aria-label="Add Task"
+              >
+                  <p>Nova Task</p>
+                  <p className="ml-2 text-sm opacity-70">
+                      shift + '+'
+                  </p>
+              </button>
+          </div>
+        </main>
       </div>
-      <button
-        onClick={handleAdd}
-        className="fixed flex flex-col left-1/2 bottom-8 transform -translate-x-1/2 bg-blue-600 text-white border-none rounded-full  px-12 py-1 text-xl shadow-lg cursor-pointer z-50 flex items-center justify-center"
-        aria-label="Add Task"
-      >
-        <p>Nova Task</p>
-        
-        <p className="ml-2 text-sm opacity-70">
-          shift + N
-        </p>
-      </button>
+      <ModalLogin />
     </>
   );
 }

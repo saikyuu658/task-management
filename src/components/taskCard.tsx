@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import type { Task } from "../@types/task";
+import { Pen, Trash} from "lucide-react";
 
 type TaskCardProps = {
     task: Task;
@@ -39,7 +40,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 type="checkbox"
                 checked={!!task.completed}
                 onChange={() => handleComplete && handleComplete(task.id, !task.completed)}
-                className="mr-4 accent-green-600"
+                className="mr-4 accent-blue-600"
                 title="Mark as completed"
                 style={{ width: "1rem", height: "1rem" }}
             />
@@ -86,14 +87,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
                         }}
                         className="mr-2 px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600 transition"
                     >
-                        Edit
+                        {<Pen size={16} />}
                     </button>
                 )}
                 <button
                     onClick={() => handleDelete(task.id)}
                     className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
                 >
-                    Delete
+                    <Trash size={16} />
                 </button>
             </div>
         </div>
