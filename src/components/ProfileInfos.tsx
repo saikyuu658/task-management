@@ -1,9 +1,13 @@
 import { LogOut, LogIn } from "lucide-react"
 import { useState } from "react";
+import ModalLogin from "./login";
 
-const ProfileInfos : React.FC = () => {
+
+
+const ProfileInfos : React.FC= () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    
+    const [isShowModal, setIsShowModal] = useState(false);
+
     
     return (
         <>
@@ -16,8 +20,10 @@ const ProfileInfos : React.FC = () => {
             <button
                 className="ml-4 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
                 onClick={() => {
-                    alert("Leaving...");
                     setIsLoggedIn(!isLoggedIn);
+                    if(!isLoggedIn) {
+                        setIsShowModal(true);
+                    }
                 }}
             >
                 {isLoggedIn ? 
@@ -26,6 +32,7 @@ const ProfileInfos : React.FC = () => {
                 }
 
             </button>
+            <ModalLogin visibility={isShowModal} onClose={()=>{setIsShowModal(false)}} />
     </>
          
     )

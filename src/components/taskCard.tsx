@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import type { Task } from "../@types/task";
-import { Pen, Trash} from "lucide-react";
+import { Check, Pen, Trash} from "lucide-react";
+import { formatDate } from "../util/formatDate";
 
 type TaskCardProps = {
     task: Task;
@@ -63,9 +64,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
                         />
                     </form>
                 ) : (
-                    <span className={`text-white ${task.completed ? "line-through opacity-60" : ""}`}>
-                        {task.text}
-                    </span>
+                    <div className="flex-1 flex flex-col">
+                        <span className={`text-white ${task.completed ? "line-through opacity-60" : ""}`}>
+                            {task.text}
+                        </span>
+                        <span className={`text-white ml-2 text-[11px] opacity-70 ${task.completed ? "line-through opacity-60" : ""}`}>
+                            {formatDate(task.createdAt)}
+                        </span>
+                    </div>
                 )}
             </div>
             <div>
@@ -77,7 +83,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
                         }}
                         className="mr-2 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                     >
-                        Save
+                        <Check size={16} />
                     </button>
                 ) : (
                     <button
