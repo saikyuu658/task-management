@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import type { Task } from "../@types/task";
-import { Check, Pen, Trash} from "lucide-react";
+import { Check, Pen, Trash } from "lucide-react";
 import { formatDate } from "../util/formatDate";
 
 type TaskCardProps = {
@@ -37,14 +37,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             key={task.id}
             className="bg-gray-800 rounded-lg shadow-md p-4 mb-4 flex items-center justify-between"
         >
-            <input
-                type="checkbox"
-                checked={!!task.completed}
-                onChange={() => handleComplete && handleComplete(task.id, !task.completed)}
-                className="mr-4 accent-blue-600"
-                title="Mark as completed"
-                style={{ width: "1rem", height: "1rem" }}
-            />
+
             <div className="flex-1 flex items-center">
                 {editingId === task.id ? (
                     <form
@@ -64,14 +57,25 @@ const TaskCard: React.FC<TaskCardProps> = ({
                         />
                     </form>
                 ) : (
-                    <div className="flex-1 flex flex-col">
-                        <span className={`text-white ${task.completed ? "line-through opacity-60" : ""}`}>
-                            {task.text}
-                        </span>
-                        <span className={`text-white ml-2 text-[11px] opacity-70 ${task.completed ? "line-through opacity-60" : ""}`}>
-                            {formatDate(task.createdAt)}
-                        </span>
-                    </div>
+                    <>
+                        <input
+                            type="checkbox"
+                            checked={!!task.completed}
+                            onChange={() => handleComplete && handleComplete(task.id, !task.completed)}
+                            className="mr-4 accent-blue-600"
+                            title="Mark as completed"
+                            style={{ width: "1rem", height: "1rem" }}
+                        />
+
+                        <div className="flex-1 flex flex-col">
+                            <span className={`text-white ${task.completed ? "line-through opacity-60" : ""}`}>
+                                {task.text}
+                            </span>
+                            <span className={`text-white ml-2 text-[11px] opacity-70 ${task.completed ? "line-through opacity-60" : ""}`}>
+                                {formatDate(task.created)}
+                            </span>
+                        </div>
+                    </>
                 )}
             </div>
             <div>

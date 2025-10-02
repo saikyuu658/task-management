@@ -1,6 +1,6 @@
 import { LogOut, LogIn } from "lucide-react"
 import { useState } from "react";
-import ModalLogin from "./login";
+import { getRequest } from "../service/apiRequest";
 
 
 
@@ -8,6 +8,14 @@ const ProfileInfos : React.FC= () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isShowModal, setIsShowModal] = useState(false);
 
+    const handleLogin = async ()=>{
+        try {
+            const res = await getRequest('auth/token', {})
+            setIsLoggedIn(true)
+        } catch (error) {
+            alert('erro')
+        }
+    }
     
     return (
         <>
@@ -19,12 +27,7 @@ const ProfileInfos : React.FC= () => {
             </div>
             <button
                 className="ml-4 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-                onClick={() => {
-                    setIsLoggedIn(!isLoggedIn);
-                    if(!isLoggedIn) {
-                        setIsShowModal(true);
-                    }
-                }}
+                onClick={handleLogin}
             >
                 {isLoggedIn ? 
                     <LogOut size={16} />
@@ -32,7 +35,7 @@ const ProfileInfos : React.FC= () => {
                 }
 
             </button>
-            <ModalLogin visibility={isShowModal} onClose={()=>{setIsShowModal(false)}} />
+            {/* <ModalLogin visibility={isShowModal} onClose={()=>{setIsShowModal(false)}} /> */}
     </>
          
     )

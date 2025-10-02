@@ -1,8 +1,10 @@
 import Sidebar from './components/sidebar';
 import Title from './components/titleTask';
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Task } from './@types/task';
 import TaskCard from './components/taskCard';
+import { deleteRequest, getRequest, postRequest, putRequest } from './service/apiRequest';
+import Loading from './components/loading';
 
 const initialTasks: Task[] = [
 ];
@@ -13,49 +15,98 @@ function App() {
   const [sideControll, setSideControll] = useState(false);
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
   const [editText, setEditText] = useState<string>("");
   const [title, setTitle] = useState<string>("Lista de tarefas");
 
-  useEffect(() => {
-      function handleResize() {
-          if (window.innerWidth <= 740) {
-              setSideControll(true);
-          } else {
-              setSideControll(false);
-          }
-      }
-      window.addEventListener("resize", handleResize);
-      handleResize();
-      return () => window.removeEventListener("resize", handleResize);
-  }, [setSideControll]);
   
-  const handleEdit = (id: number) => {
-    if (editText.trim() === "") return;
+  
+  const handleEdit = async (id: number) => {
+    if (editText.trim() === "") return alert('Empty field');
+
+    try {
+      const payload = tasks.filter(t => t.id === id)
+      if(payload.length == 0) {
+        return
+      }
+      const res = await putRequest('task', payload[0], {}) as Task
+      setTasks(tasks.map(t => t.id === res.id ? { ...res, } : t));
+    } catch (error:any) {
+      alert(error.message)
+    }
+
     setTasks(tasks.map(t => t.id === id ? { ...t, text: editText } : t));
     setEditingId(null);
     setEditText("");
   }
 
-  const handleDelete = (id: number) => {
-    setTasks(tasks.filter(t => t.id !== id));
+  const handleDelete = async (id: number) => {
+    try {
+      setIsVisible(true)
+      const res = await deleteRequest('task/' + id, {})
+      setTasks(tasks.filter(t => t.id !== id));      
+      setIsVisible(false)
+    } catch (error: any) {
+      alert(error.message)
+      setIsVisible(false)
+    }
   }
 
-  const handleComplete = (id: number, completed: boolean) => {
-    setTasks(tasks.map(t => t.id === id ? { ...t, completed } : t));
+  const handleComplete = async (id: number, completed: boolean) => {
+    try {
+      const payload = tasks.filter(t => t.id === id)
+      if(payload.length == 0) {
+        return
+      }
+      payload[0].completed = completed
+      const res = await putRequest('task', payload[0], {}) as Task
+      setTasks(tasks.map(t => t.id === res.id ? { ...res, } : t));
+    } catch (error:any) {
+      alert(error.message)
+    }
   }
 
-  const handleAddTask = () => {
-    const newTask: Task = {
+  const handleAddTask = async () => {
+    try {
+      setIsVisible(true)
+      const newTask: Task = {
         id: tasks.length ? Math.max(...tasks.map(t => t.id)) + 1 : 1,
         text: "New Task",
         completed: false,
-        createdAt: new Date(),
-        updatedAt: new Date()
-    };
+        created: new Date(),
+      };
+      const res = await postRequest('task', newTask, {}) as Task
+      setEditText("New Task");
+      setEditingId(newTask.id);
+      setTasks([...tasks, res]);
+      setIsVisible(false)
 
-    setEditText("New Task");
-    setEditingId(newTask.id);
-    setTasks([...tasks, newTask]);
+    } catch (error: any) {
+      alert(error.message)
+      console.log(error)
+      setIsVisible(false)
+    }
+  }
+
+  const fetchData = async ()=>{
+    try {
+      setIsVisible(true)
+      const res = await getRequest('task', {}) as Task[] | [];
+      setTasks(res)
+      setIsVisible(false)
+    } catch (error: any) {
+      setIsVisible(false)
+      alert(error.message)
+    }
+  }
+
+  const fetchListTaksName = async ()=>{
+    let tempTitle = localStorage.getItem("title");
+    if(!tempTitle){
+      tempTitle = 'Lista de tarefas'
+    }
+
+    setTitle(tempTitle)
   }
 
   useEffect(() => {
@@ -69,9 +120,31 @@ function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [tasks]);
 
+  useEffect(() => {
+      function handleResize() {
+          if (window.innerWidth <= 740) {
+              setSideControll(true);
+          } else {
+              setSideControll(false);
+          }
+      }
+      window.addEventListener("resize", handleResize);
+      handleResize();
+      return () => window.removeEventListener("resize", handleResize);
+  }, [setSideControll]);
+
+  useEffect(() => {
+
+      fetchData()
+      fetchListTaksName()
+  }, []);
+
   const handleEditTitle = (newTitle: string) => {
+    localStorage.setItem('title', newTitle)
     setTitle(newTitle);
   }
+
+ 
 
   return (
     <>
@@ -122,6 +195,7 @@ function App() {
           </div>
         </main>
       </div>
+      <Loading isVisible={isVisible}></Loading>
     </>
   );
 }

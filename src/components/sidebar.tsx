@@ -3,6 +3,7 @@ import { StepForward, StepBack } from "lucide-react";
 import { useEffect } from "react";
 import ProfileInfos from "./profileInfos";
 import type { Task } from "../@types/task";
+import { formatDate } from "../util/formatDate";
 
 
 interface SidebarProps {
@@ -54,13 +55,12 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                 </button>
                 {sideControll === "w-80" && (
                     <>
-
                         <div>
-
                             {filteredItems.length === 0 ?
                                 (<p className="text-gray-500 py-2">Nenhum Tarefa concluída</p>)
                                 : (
                                     <>
+                                        <h2 className="text-lg font-semibold mb-5">Tarefas concluídas</h2>
                                         <input
                                             type="text"
                                             placeholder="Pesquisar..."
@@ -74,7 +74,8 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                                                     key={item.id}
                                                     className="py-2 cursor-pointer rounded-md px-3 hover:bg-gray-800 transition word-break"
                                                 >
-                                                    {item.text}
+                                                    <span>{item.text}</span>
+                                                    <span className="ml-2 text-sm opacity-70">Concluido: {formatDate(item.updated ?? new Date())}</span>
                                                 </li>
                                             ))}
                                             
