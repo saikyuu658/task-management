@@ -2,18 +2,22 @@ import { LogOut, LogIn } from "lucide-react"
 import { useState } from "react";
 import { getRequest } from "../service/apiRequest";
 
+interface ProfileInfosProps {
+    setTokenCrsf: (tokenCrsf: string)=> void
+}
 
-
-const ProfileInfos : React.FC= () => {
+const ProfileInfos : React.FC<ProfileInfosProps>= (props) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [isShowModal, setIsShowModal] = useState(false);
+    // const [isShowModal, setIsShowModal] = useState(false);
 
     const handleLogin = async ()=>{
         try {
             const res = await getRequest('auth/token', {})
+            props.setTokenCrsf(res.csrfToken)
             setIsLoggedIn(true)
-        } catch (error) {
-            alert('erro')
+        } catch (error:any) {
+            console.log(error.toString())
+            alert(error)
         }
     }
     

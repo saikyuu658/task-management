@@ -8,6 +8,7 @@ import { formatDate } from "../util/formatDate";
 
 interface SidebarProps {
     sidebarItems: Task[];
+    setTokenCrsf : (tokenCrsf: string)=> void
 }
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
@@ -88,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                         
                         {/* Profile info and leave option floating at bottom */}
                         <div className="absolute bottom-4 left-4 right-4  bg-gray-800 rounded p-3 flex items-center justify-between shadow">
-                            <ProfileInfos />
+                            <ProfileInfos setTokenCrsf={props.setTokenCrsf}/>
                         </div>
                     </>
                 )}

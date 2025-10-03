@@ -2,6 +2,7 @@ import type { Task } from "../@types/task"
 
 const URL_BASE = 'http://localhost:3000/'
 
+
 export const getRequest = async (url: string, headers: {})=>{
     try {
         const res = await fetch(URL_BASE+url, {
@@ -10,12 +11,11 @@ export const getRequest = async (url: string, headers: {})=>{
         })
         const result = await res.json()
         if(!res.ok){
-            throw new Error(result.data.message)
+            throw new Error(result)
         }
         return result
     } catch (error: any) {
         throw new Error(error.message)
-        
     }
 }
 
@@ -24,29 +24,28 @@ export const postRequest = async (url: string, body: Task, headers: {})=>{
         const res = await fetch(URL_BASE+url, {
             method: 'POST',
             body: JSON.stringify({task: body}),
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
                 ...headers
             }
         })
+        const result = await res.json()
         
         if(!res.ok){
-            throw new Error('meu pau')
+            throw new Error(result)
         }
-        const result = await res.json()
         return result
     } catch (error:any) {
-        console.log(error.message)
-        throw new Error('meu pau')
+        throw new Error(error.message)
     }
 }
 
 export const putRequest = async (url: string, body: Task, headers: {})=>{
      try {
-
-        
         const res = await fetch(URL_BASE+url, {
             method: 'PUT',
+            credentials: 'include',
             body: JSON.stringify({task: body}),
             headers: {
                 'Content-Type': 'application/json',
@@ -54,29 +53,35 @@ export const putRequest = async (url: string, body: Task, headers: {})=>{
             }
         })
         
-        if(!res.ok){
-            throw new Error('meu pau')
-        }
         const result = await res.json()
+        if(!res.ok){
+            throw new Error(result)
+        }
         return result
     } catch (error:any) {
         console.log(error.message)
-        throw new Error('meu pau')
+        throw new Error(error.message)
     }
 }
 
 export const deleteRequest = async (url: string, headers: {})=>{
-    const res = await fetch(URL_BASE+url, {
-        method: 'DELETE',
-        headers: {
-            ...headers
+
+    try {
+        const res = await fetch(URL_BASE+url, {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: {
+                ...headers
+            }
+        })
+        const result = await res.json()
+        if(!res.ok){
+            throw new Error(result)
         }
-    })
-    const result = await res.json()
-    if(!res.ok){
-        throw new Error(result.data.message)
+    } catch (error:any) {
+        throw new Error(error.message)
     }
-    return result
+    
 }
 
 

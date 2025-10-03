@@ -9,7 +9,6 @@ import Loading from './components/loading';
 const initialTasks: Task[] = [
 ];
 
-
 function App() {
 
   const [sideControll, setSideControll] = useState(false);
@@ -18,8 +17,11 @@ function App() {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [editText, setEditText] = useState<string>("");
   const [title, setTitle] = useState<string>("Lista de tarefas");
+  const [tokenCrsf, setTokenCrsf] = useState<string>("");
 
-  
+  useEffect(()=>{
+    console.log(tokenCrsf)
+  },[tokenCrsf])
   
   const handleEdit = async (id: number) => {
     if (editText.trim() === "") return alert('Empty field');
@@ -43,7 +45,7 @@ function App() {
   const handleDelete = async (id: number) => {
     try {
       setIsVisible(true)
-      const res = await deleteRequest('task/' + id, {})
+      await deleteRequest('task/' + id, {})
       setTasks(tasks.filter(t => t.id !== id));      
       setIsVisible(false)
     } catch (error: any) {
@@ -59,7 +61,10 @@ function App() {
         return
       }
       payload[0].completed = completed
-      const res = await putRequest('task', payload[0], {}) as Task
+      const res = await putRequest('task', payload[0], {
+        withCredentials: true,
+        xsrfCookieName: '_csrf'
+      }) as Task
       setTasks(tasks.map(t => t.id === res.id ? { ...res, } : t));
     } catch (error:any) {
       alert(error.message)
@@ -134,7 +139,6 @@ function App() {
   }, [setSideControll]);
 
   useEffect(() => {
-
       fetchData()
       fetchListTaksName()
   }, []);
@@ -144,13 +148,11 @@ function App() {
     setTitle(newTitle);
   }
 
- 
-
   return (
     <>
       <div className="flex min-h-screen">
         <div className={sideControll? "fixed z-50": ""}>
-          <Sidebar sidebarItems={tasks.filter(e=>e.completed)}/>
+          <Sidebar sidebarItems={tasks.filter(e=>e.completed)} setTokenCrsf={setTokenCrsf}/>
         </div>
         <main className="flex-1 bg-gray-900 text-white p-4">
           <Title title={title} handleTitleChange={handleEditTitle}/>
