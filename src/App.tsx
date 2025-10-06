@@ -31,7 +31,7 @@ function App() {
       if(payload.length == 0) {
         return
       }
-      const res = await putRequest('task', payload[0], {}) as Task
+      const res = await putRequest('task', payload[0], tokenCrsf) as Task
       setTasks(tasks.map(t => t.id === res.id ? { ...res, } : t));
     } catch (error:any) {
       alert(error.message)
@@ -61,10 +61,8 @@ function App() {
         return
       }
       payload[0].completed = completed
-      const res = await putRequest('task', payload[0], {
-        withCredentials: true,
-        xsrfCookieName: '_csrf'
-      }) as Task
+      console.log(tokenCrsf)
+      const res = await putRequest('task', payload[0], tokenCrsf) as Task
       setTasks(tasks.map(t => t.id === res.id ? { ...res, } : t));
     } catch (error:any) {
       alert(error.message)
@@ -80,10 +78,10 @@ function App() {
         completed: false,
         created: new Date(),
       };
-      const res = await postRequest('task', newTask, {}) as Task
+      // const res = await postRequest('task', newTask, {}) as Task
       setEditText("New Task");
       setEditingId(newTask.id);
-      setTasks([...tasks, res]);
+      setTasks([...tasks, newTask]);
       setIsVisible(false)
 
     } catch (error: any) {
@@ -115,17 +113,6 @@ function App() {
   }
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.ctrlKey && e.key === 'Enter') {
-            handleAddTask();
-        }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [tasks]);
-
-  useEffect(() => {
       function handleResize() {
           if (window.innerWidth <= 740) {
               setSideControll(true);
@@ -139,15 +126,23 @@ function App() {
   }, [setSideControll]);
 
   useEffect(() => {
-      fetchData()
-      fetchListTaksName()
+    fetchData()
+    fetchListTaksName()
+     const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.ctrlKey && e.key === 'Enter') {
+            handleAddTask();
+        }
+      };
+
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+     
   }, []);
 
   const handleEditTitle = (newTitle: string) => {
     localStorage.setItem('title', newTitle)
     setTitle(newTitle);
   }
-
   return (
     <>
       <div className="flex min-h-screen">

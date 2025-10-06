@@ -14,6 +14,7 @@ const ProfileInfos : React.FC<ProfileInfosProps>= (props) => {
         try {
             const res = await getRequest('auth/token', {})
             props.setTokenCrsf(res.csrfToken)
+            alert('token salved')
             setIsLoggedIn(true)
         } catch (error:any) {
             console.log(error.toString())

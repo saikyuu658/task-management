@@ -41,15 +41,17 @@ export const postRequest = async (url: string, body: Task, headers: {})=>{
     }
 }
 
-export const putRequest = async (url: string, body: Task, headers: {})=>{
+export const putRequest = async (url: string, body: Task, token: string)=>{
      try {
+        
+        console.log('=== REQUEST DEBUG ===');
         const res = await fetch(URL_BASE+url, {
             method: 'PUT',
             credentials: 'include',
             body: JSON.stringify({task: body}),
             headers: {
                 'Content-Type': 'application/json',
-                ...headers
+                'x-csrf-token': token
             }
         })
         
